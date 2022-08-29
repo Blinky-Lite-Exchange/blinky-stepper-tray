@@ -1,0 +1,9 @@
+MQTTSUBSCRIBE=blinky-lite-v4/blinky-stepper/02/setting/#
+MQTTCLIENTID=blinky-stepper-tray-02
+MQTTSERVERIP=aaaa
+MQTTUSERNAME=bbbb
+MQTTPASSWORD=cccc
+SERIALPORT=/dev/rfcomm0
+SERIALBUFSIZE=20
+PM2NAME=blinky-stepper-02
+NODEREDCONFIGSECRET=dddd

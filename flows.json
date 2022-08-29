@@ -8,26 +8,6 @@
         "env": []
     },
     {
-        "id": "40e56362c23599cc",
-        "type": "group",
-        "z": "281e0a510310e9c6",
-        "name": "Edit Me",
-        "style": {
-            "fill": "#9363b7",
-            "label": true,
-            "label-position": "n",
-            "color": "#ffff00",
-            "stroke": "#001f60"
-        },
-        "nodes": [
-            "5e7d2de841bcb0c1"
-        ],
-        "x": 974,
-        "y": 19,
-        "w": 172,
-        "h": 82
-    },
-    {
         "id": "cc88dacde90c32cd",
         "type": "group",
         "z": "281e0a510310e9c6",
@@ -66,6 +46,26 @@
         "y": 331.5,
         "w": 212,
         "h": 97
+    },
+    {
+        "id": "cb2ba81e424b90fd",
+        "type": "group",
+        "z": "281e0a510310e9c6",
+        "name": "Edit Me",
+        "style": {
+            "fill": "#9363b7",
+            "label": true,
+            "label-position": "n",
+            "color": "#ffff00",
+            "stroke": "#001f60"
+        },
+        "nodes": [
+            "4fb82a040f704c8a"
+        ],
+        "x": 814,
+        "y": 1019,
+        "w": 172,
+        "h": 82
     },
     {
         "id": "6ad7c930.1a06b8",
@@ -207,19 +207,15 @@
         "type": "function",
         "z": "281e0a510310e9c6",
         "name": "Save tray config in Memory",
-        "func": "global.set('settingInProgress', true);\nglobal.set('tray', msg.payload);\nglobal.set('deviceInit', 1);\nreturn msg;",
-        "outputs": 1,
+        "func": "global.set('settingInProgress', false);\nmsg.payload.watchdog.value = 0;\nglobal.set('tray', msg.payload);\nglobal.set('deviceInit', 0);\nreturn msg;",
+        "outputs": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 820,
         "y": 60,
-        "wires": [
-            [
-                "5e7d2de841bcb0c1"
-            ]
-        ]
+        "wires": []
     },
     {
         "id": "5023092b.a0fe38",
@@ -495,7 +491,7 @@
         "type": "function",
         "z": "281e0a510310e9c6",
         "name": "Readings Alarm Scan",
-        "func": "var newData = msg.payload;\nvar tray = global.get('tray');\ntray.linkQuality.value     = global.get('linkQuality');\ntray.signalLevel.value     = global.get('signalLevel');\nvar alarmFlagReading = scalarAlarmScan(tray, 'reading');\nvar alarmFlagSetting = scalarAlarmScan(tray, 'setting');\nvar newMsg   = null;\nvar newSettingMsg = null;\nif (msg.topic == 'newSetting')\n{\n    newSettingMsg = \n    {\n        topic: 'newSetting',\n        payload: true\n    }\n};\nif (newData)\n{\n    newMsg = \n    {\n        topic: 'newData',\n        payload: true\n    }\n}\nreturn [newMsg, newSettingMsg];\n\nfunction getActionArray(tray, type, actionType)\n{\n    var actionArray = [];\n    var keys = Object.keys(tray);\n    for (var ii = 0; ii < keys.length; ++ii)\n    {\n        if (tray[keys[ii]].hasOwnProperty('type'))\n        {\n            if (tray[keys[ii]].type == type)\n            {\n                if (tray[keys[ii]].action == actionType)\n                {\n                    actionArray.push(tray[keys[ii]]);\n                }\n            }\n        }\n    }\n    return actionArray;\n}\nfunction scalarAlarmScan(tray, actionType)\n{\n    var alarmFlag = false;\n    var actionArray = getActionArray(tray, 'scalar', actionType);\n    if (actionArray.length > 0)\n    {\n        for (var ii = 0; ii < actionArray.length; ++ii)\n        {\n            let oldAlarmValue = actionArray[ii].alarm.value;\n            actionArray[ii].alarm.value = 0;\n            if (!isNaN(actionArray[ii].value))\n            {\n                if (actionArray[ii].value <= actionArray[ii].alarm.limits.low)  actionArray[ii].alarm.value = 1;\n                if (actionArray[ii].value <= actionArray[ii].alarm.limits.lolo) actionArray[ii].alarm.value = 3;\n                if (actionArray[ii].value >= actionArray[ii].alarm.limits.high) actionArray[ii].alarm.value = 2;\n                if (actionArray[ii].value >= actionArray[ii].alarm.limits.hihi) actionArray[ii].alarm.value = 4;\n                if (actionArray[ii].alarm.value != oldAlarmValue) alarmFlag = true;\n            }\n        }\n    }\n    return alarmFlag;\n}\n",
+        "func": "var newData = msg.payload;\nvar tray = global.get('tray');\ntray.linkQuality.value     = global.get('linkQuality');\ntray.signalLevel.value     = global.get('signalLevel');\nvar alarmFlagReading = scalarAlarmScan(tray, 'reading');\nvar alarmFlagSetting = scalarAlarmScan(tray, 'setting');\nvar newMsg   = null;\nvar newSettingMsg = null;\nif (msg.topic == 'newSetting')\n{\n    newSettingMsg = \n    {\n        topic: 'newSetting',\n        payload: true\n    }\n}\nif (newData)\n{\n    newMsg = \n    {\n        topic: 'newData',\n        payload: true\n    }\n}\nreturn [newMsg, newSettingMsg];\n\nfunction getActionArray(tray, type, actionType)\n{\n    var actionArray = [];\n    var keys = Object.keys(tray);\n    for (var ii = 0; ii < keys.length; ++ii)\n    {\n        if (tray[keys[ii]].hasOwnProperty('type'))\n        {\n            if (tray[keys[ii]].type == type)\n            {\n                if (tray[keys[ii]].action == actionType)\n                {\n                    actionArray.push(tray[keys[ii]]);\n                }\n            }\n        }\n    }\n    return actionArray;\n}\nfunction scalarAlarmScan(tray, actionType)\n{\n    var alarmFlag = false;\n    var actionArray = getActionArray(tray, 'scalar', actionType);\n    if (actionArray.length > 0)\n    {\n        for (var ii = 0; ii < actionArray.length; ++ii)\n        {\n            let oldAlarmValue = actionArray[ii].alarm.value;\n            actionArray[ii].alarm.value = 0;\n            if (!isNaN(actionArray[ii].value))\n            {\n                if (actionArray[ii].value <= actionArray[ii].alarm.limits.low)  actionArray[ii].alarm.value = 1;\n                if (actionArray[ii].value <= actionArray[ii].alarm.limits.lolo) actionArray[ii].alarm.value = 3;\n                if (actionArray[ii].value >= actionArray[ii].alarm.limits.high) actionArray[ii].alarm.value = 2;\n                if (actionArray[ii].value >= actionArray[ii].alarm.limits.hihi) actionArray[ii].alarm.value = 4;\n                if (actionArray[ii].alarm.value != oldAlarmValue) alarmFlag = true;\n            }\n        }\n    }\n    return alarmFlag;\n}\n",
         "outputs": 2,
         "noerr": 0,
         "initialize": "// Code added here will be run once\n// whenever the node is started.\ncontext.set('lastAlarm', -1);",
@@ -740,50 +736,6 @@
         "wires": []
     },
     {
-        "id": "930b94f38479787c",
-        "type": "split",
-        "z": "281e0a510310e9c6",
-        "name": "",
-        "splt": "\\n",
-        "spltType": "str",
-        "arraySplt": 1,
-        "arraySpltType": "len",
-        "stream": false,
-        "addname": "",
-        "x": 1410,
-        "y": 60,
-        "wires": [
-            [
-                "69d1e54394d2fd5e"
-            ]
-        ]
-    },
-    {
-        "id": "69d1e54394d2fd5e",
-        "type": "delay",
-        "z": "281e0a510310e9c6",
-        "name": "",
-        "pauseType": "rate",
-        "timeout": "5",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 1560,
-        "y": 60,
-        "wires": [
-            [
-                "742713de179bd6ce"
-            ]
-        ]
-    },
-    {
         "id": "c81b72b9290d1c36",
         "type": "link out",
         "z": "281e0a510310e9c6",
@@ -861,7 +813,8 @@
             "1e34df4b19ff22cc",
             "75aab98047eea696",
             "344a2a68c26672b2",
-            "9f8c3b4630e734a3"
+            "9f8c3b4630e734a3",
+            "d627c61f63b32aba"
         ],
         "x": 935,
         "y": 420,
@@ -975,52 +928,6 @@
         "wires": []
     },
     {
-        "id": "3c51c680e18abf95",
-        "type": "function",
-        "z": "281e0a510310e9c6",
-        "name": "Allow Readings",
-        "func": "if (msg.payload.address == -1)\n{\n    global.set('settingInProgress',false);\n    global.set('deviceInit', 0);\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 2040,
-        "y": 120,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "961b85c2472cee35",
-        "type": "link out",
-        "z": "281e0a510310e9c6",
-        "name": "begin re-init device",
-        "mode": "link",
-        "links": [
-            "5aebb0b38ba2e191"
-        ],
-        "x": 835,
-        "y": 1020,
-        "wires": []
-    },
-    {
-        "id": "5aebb0b38ba2e191",
-        "type": "link in",
-        "z": "281e0a510310e9c6",
-        "name": "read tray config in",
-        "links": [
-            "961b85c2472cee35"
-        ],
-        "x": 915,
-        "y": 100,
-        "wires": [
-            [
-                "5e7d2de841bcb0c1"
-            ]
-        ]
-    },
-    {
         "id": "6af76a294daa96eb",
         "type": "function",
         "z": "281e0a510310e9c6",
@@ -1107,7 +1014,7 @@
         "type": "function",
         "z": "281e0a510310e9c6",
         "name": "Check Reading",
-        "func": "var serialBufSize = global.get('serialBufSize');\nvar dataView     = new DataView(new ArrayBuffer(2));\nvar dataBuffer = [];\nfor (var ii = 0; ii < (msg.payload.length / 2); ++ii)\n{\n    for (ib = 0; ib < 2; ++ib)   dataView.setUint8(ib, msg.payload[(ii * 2) + 1 - ib]);\n    dataBuffer.push( dataView.getInt16(0));\n}\nvar topic = 'newReading';\nif (global.get('settingInProgress'))\n{\n    topic = 'newSetting';\n    if (global.get('deviceInit') < 1);\n        global.set('settingInProgress', false)\n}\nglobal.get('tray').timeStamp = new Date().getTime();\nif (dataBuffer[0] == 1)\n{\n    var initDeviceMsg = {topic:\"initDevice\",payload:true};\n    global.set('settingInProgress', true)\n    global.set('deviceInit', 2);\n    return [null, initDeviceMsg];\n}\nreturn [{topic:topic, payload:dataBuffer},null];\n\n\n\n",
+        "func": "var serialBufSize = global.get('serialBufSize');\nvar dataView     = new DataView(new ArrayBuffer(2));\nvar dataBuffer = [];\nfor (var ii = 0; ii < (msg.payload.length / 2); ++ii)\n{\n    for (ib = 0; ib < 2; ++ib)   dataView.setUint8(ib, msg.payload[(ii * 2) + 1 - ib]);\n    dataBuffer.push( dataView.getInt16(0));\n}\nvar topic = 'newReading';\nif (global.get('settingInProgress'))\n{\n    topic = 'newSetting';\n    if (global.get('deviceInit') < 1);\n        global.set('settingInProgress', false)\n}\nglobal.get('tray').timeStamp = new Date().getTime();\nif (dataBuffer[0] == 1)\n{\n    var initDeviceMsg = {topic:\"initDevice\",payload:true};\n    global.set('settingInProgress', true)\n    global.set('deviceInit', 1);\n    return [null, initDeviceMsg];\n}\nreturn [{topic:topic, payload:dataBuffer},null];\n\n\n\n",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -1120,7 +1027,7 @@
                 "ed6ec66d5cb48297"
             ],
             [
-                "961b85c2472cee35"
+                "4fb82a040f704c8a"
             ]
         ]
     },
@@ -1132,7 +1039,8 @@
         "links": [
             "01598091ca19387c",
             "aa428318895690ee",
-            "93758a55568a2f76"
+            "93758a55568a2f76",
+            "f062ce76931cf3e8"
         ],
         "x": 35,
         "y": 960,
@@ -1171,19 +1079,6 @@
         ],
         "x": 835,
         "y": 980,
-        "wires": []
-    },
-    {
-        "id": "aa428318895690ee",
-        "type": "link out",
-        "z": "281e0a510310e9c6",
-        "name": "Init device setting in",
-        "mode": "link",
-        "links": [
-            "b0f91914917b2de1"
-        ],
-        "x": 1815,
-        "y": 60,
         "wires": []
     },
     {
@@ -1227,89 +1122,6 @@
         "x": 495,
         "y": 340,
         "wires": []
-    },
-    {
-        "id": "ebb5481bd4277b24",
-        "type": "delay",
-        "z": "281e0a510310e9c6",
-        "name": "",
-        "pauseType": "delay",
-        "timeout": "5",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 1270,
-        "y": 60,
-        "wires": [
-            [
-                "930b94f38479787c"
-            ]
-        ]
-    },
-    {
-        "id": "742713de179bd6ce",
-        "type": "switch",
-        "z": "281e0a510310e9c6",
-        "name": "",
-        "property": "payload.address",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "gte",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "eq",
-                "v": "-1",
-                "vt": "num"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1710,
-        "y": 60,
-        "wires": [
-            [
-                "aa428318895690ee"
-            ],
-            [
-                "cc28796b6343f69f"
-            ]
-        ]
-    },
-    {
-        "id": "cc28796b6343f69f",
-        "type": "delay",
-        "z": "281e0a510310e9c6",
-        "name": "",
-        "pauseType": "delay",
-        "timeout": "2",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 1860,
-        "y": 120,
-        "wires": [
-            [
-                "3c51c680e18abf95"
-            ]
-        ]
     },
     {
         "id": "10e54acd6f4f5fb4",
@@ -1688,35 +1500,15 @@
         "wires": []
     },
     {
-        "id": "5e7d2de841bcb0c1",
-        "type": "function",
-        "z": "281e0a510310e9c6",
-        "g": "40e56362c23599cc",
-        "name": "Init Gizmo",
-        "func": "var tray = global.get('tray');\nvar deviceInit = global.get('deviceInit');\nif (deviceInit == 1) //tray rebooted\n{\n    \n}\nif (deviceInit == 2) //device rebooted\n{\n    \n}\n\nvar msgs = [];\nmsgs[0] = {\"address\":0,\"value\":0};\nmsgs[1] = {\"address\":1,\"value\":0}; //device.moveMotor.value\nmsgs[2] = {\"address\":2,\"value\":tray.resetStepReading.value};\nmsgs[3] = {\"address\":3,\"value\":tray.noStepsToTurn.value};\nmsgs[4] = {\"address\":4,\"value\":tray.stepForward.value};\nmsgs[5] = {\"address\":5,\"value\":tray.stepDelayuS.value};\nmsgs[6] = {\"address\":6,\"value\":tray.stayAwakeAfterRotation.value};\nmsgs[7] = {\"address\":7,\"value\":tray.resolution.value};\nmsgs[8] = {\"address\":8,\"value\":tray.delayAfterRotationmS.value};\n//must be the last!\nmsgs[9] = {\"address\":-1,\"value\":0};\nreturn {topic : 'initDevice', payload: msgs};\n",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1060,
-        "y": 60,
-        "wires": [
-            [
-                "ebb5481bd4277b24"
-            ]
-        ]
-    },
-    {
         "id": "352395cfbb5c4259",
         "type": "function",
         "z": "281e0a510310e9c6",
         "g": "cc88dacde90c32cd",
         "name": "Create Readings",
-        "func": "var tray = global.get('tray');\nvar newData = true;\ntray.moveMotor.value              = msg.payload[1];\ntray.resetStepReading.value       = msg.payload[2];\ntray.noStepsToTurn.value          = msg.payload[3];\ntray.stepForward.value            = msg.payload[4];\ntray.stepDelayuS.value            = msg.payload[5];\ntray.stayAwakeAfterRotation.value = msg.payload[6];\ntray.resolution.value             = msg.payload[7];\ntray.delayAfterRotationmS.value   = msg.payload[8];\ntray.stepLocation.value           = msg.payload[9];\n\nreturn  {topic:msg.topic, payload:newData}\n",
-        "outputs": 1,
+        "func": "var tray = global.get('tray');\nvar newData = true;\ntray.moveMotor.value              = msg.payload[1];\ntray.resetStepReading.value       = msg.payload[2];\ntray.noStepsToTurn.value          = msg.payload[3];\ntray.stepForward.value            = msg.payload[4];\ntray.stepDelayuS.value            = msg.payload[5];\ntray.stayAwakeAfterRotation.value = msg.payload[6];\ntray.resolution.value             = msg.payload[7];\ntray.delayAfterRotationmS.value   = msg.payload[8];\ntray.stepLocation.value           = msg.payload[9];\n\ntray.watchdog.value = tray.watchdog.value + 1;\nif (tray.watchdog.value > 32760) tray.watchdog.value = 0;\n\nvar writeTrayMsg = null;\nif ((context.get('moveMotor') == 1) && (tray.moveMotor.value == 0) )\n{\n    writeTrayMsg = {topic:'newPos',payload:true};\n}\ncontext.set('moveMotor',tray.moveMotor.value);\n\n\nreturn  [{topic:msg.topic, payload:newData},writeTrayMsg]\n",
+        "outputs": 2,
         "noerr": 0,
-        "initialize": "",
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\ncontext.set('moveMotor',0);",
         "finalize": "",
         "libs": [],
         "x": 630,
@@ -1724,6 +1516,9 @@
         "wires": [
             [
                 "99fbe8135d0ce161"
+            ],
+            [
+                "d627c61f63b32aba"
             ]
         ]
     },
@@ -1752,5 +1547,195 @@
                 "1e34df4b19ff22cc"
             ]
         ]
+    },
+    {
+        "id": "009950b67a481295",
+        "type": "split",
+        "z": "281e0a510310e9c6",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 1250,
+        "y": 1060,
+        "wires": [
+            [
+                "4f915fff2d8cdb00"
+            ]
+        ]
+    },
+    {
+        "id": "4f915fff2d8cdb00",
+        "type": "delay",
+        "z": "281e0a510310e9c6",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1400,
+        "y": 1060,
+        "wires": [
+            [
+                "13658e132ede59b0"
+            ]
+        ]
+    },
+    {
+        "id": "a353a92231c0098a",
+        "type": "function",
+        "z": "281e0a510310e9c6",
+        "name": "Allow Readings",
+        "func": "if (msg.payload.address == -1)\n{\n    global.set('settingInProgress',false);\n    global.set('deviceInit', 0);\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1880,
+        "y": 1120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f062ce76931cf3e8",
+        "type": "link out",
+        "z": "281e0a510310e9c6",
+        "name": "Init device setting in",
+        "mode": "link",
+        "links": [
+            "b0f91914917b2de1"
+        ],
+        "x": 1655,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "e4a754b93a41d04b",
+        "type": "delay",
+        "z": "281e0a510310e9c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1110,
+        "y": 1060,
+        "wires": [
+            [
+                "009950b67a481295"
+            ]
+        ]
+    },
+    {
+        "id": "13658e132ede59b0",
+        "type": "switch",
+        "z": "281e0a510310e9c6",
+        "name": "",
+        "property": "payload.address",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1550,
+        "y": 1060,
+        "wires": [
+            [
+                "f062ce76931cf3e8"
+            ],
+            [
+                "65558db8f5bb277f"
+            ]
+        ]
+    },
+    {
+        "id": "65558db8f5bb277f",
+        "type": "delay",
+        "z": "281e0a510310e9c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "2",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1700,
+        "y": 1120,
+        "wires": [
+            [
+                "a353a92231c0098a"
+            ]
+        ]
+    },
+    {
+        "id": "4fb82a040f704c8a",
+        "type": "function",
+        "z": "281e0a510310e9c6",
+        "g": "cb2ba81e424b90fd",
+        "name": "Init Gizmo",
+        "func": "var tray = global.get('tray');\n\nvar msgs = [];\nmsgs[0] = {\"address\":0,\"value\":0};\nmsgs[1] = {\"address\":1,\"value\":0}; //device.moveMotor.value\nmsgs[2] = {\"address\":2,\"value\":tray.resetStepReading.value};\nmsgs[3] = {\"address\":3,\"value\":tray.noStepsToTurn.value};\nmsgs[4] = {\"address\":4,\"value\":tray.stepForward.value};\nmsgs[5] = {\"address\":5,\"value\":tray.stepDelayuS.value};\nmsgs[6] = {\"address\":6,\"value\":tray.stayAwakeAfterRotation.value};\nmsgs[7] = {\"address\":7,\"value\":tray.resolution.value};\nmsgs[8] = {\"address\":8,\"value\":tray.delayAfterRotationmS.value};\nmsgs[9] = {\"address\":9,\"value\":tray.stepLocation.value};\n//must be the last!\nmsgs[10] = {\"address\":-1,\"value\":0};\nreturn {topic : 'initDevice', payload: msgs};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 1060,
+        "wires": [
+            [
+                "e4a754b93a41d04b"
+            ]
+        ]
+    },
+    {
+        "id": "d627c61f63b32aba",
+        "type": "link out",
+        "z": "281e0a510310e9c6",
+        "name": "Save motor location",
+        "mode": "link",
+        "links": [
+            "04d132d87ffeb91a"
+        ],
+        "x": 795,
+        "y": 680,
+        "wires": []
     }
 ]
